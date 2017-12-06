@@ -1,0 +1,10 @@
+export(RBF_Ftest)
+export(RBF_ttest)
+export(plot_RBF)
+
+exportClasses(ReplicationBF)
+
+importFrom(Rdpack, reprompt)
+importFrom("stats", "df", "dt", "integrate", "qnorm", "rnorm", "runif",
+                    "approxfun", "density")
+importFrom("graphics", "par", "plot")

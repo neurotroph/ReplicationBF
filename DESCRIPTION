@@ -1,0 +1,28 @@
+Package: ReplicationBF
+Type: Package
+Title: Calculating Replication Bayes Factors for Different Scenarios
+Version: 0.0.0.9000
+Date: 2017-11-19
+Authors@R: person("Christopher", "Harms",
+    email = "christopher.harms@uni-bonn.de", role = c("aut", "cre"))
+Description: This package allows to easily calculate Replication Bayes Factors
+    (RBF) for common t- and F-test scenarios.
+URL: https://github.com/neurotroph/ReplicationBF
+BugReports: https://github.com/neurotroph/ReplicationBF/issues
+License: MIT License + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 3.0.1)
+Imports:
+    MCMCpack (>= 1.4.0),
+    Rdpack,
+    R.utils
+Suggests:
+    MBESS (>= 4.4.1),
+    ggplot2 (>= 2.2.1),
+    knitr,
+    rmarkdown,
+    methods
+RdMacros: Rdpack
+LazyData: true
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr

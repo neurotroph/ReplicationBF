@@ -1,0 +1,34 @@
+---
+title: "ReplicationBF Package"
+author: "Christopher Harms"
+date: "`r Sys.Date()`"
+bibliography: rbf-vignette-literature.bib
+csl: apa.csl
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ReplicationBF Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `ReplicationBF` package for R allows users to easily compute Replication
+Bayes Factors for two common scenarios. @Verhagen2014 introduced
+this approach to evaluate and quantify the outcome of a replication study within
+a Bayesian hypothesis testing framework.
+
+The original proposed method considered one and two sample t-Tests, which is
+implemented in the `RBF_ttest` function.
+
+An extension to F-tests is available in the `RBF_Ftest` function.
+
+Please refer to @Verhagen2014 und @Harms2016 for details until this vignette is
+finished.
+
+# References
