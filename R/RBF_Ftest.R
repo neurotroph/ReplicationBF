@@ -54,41 +54,133 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
       length(N.rep) != 1)
     stop("F-statistic and overall N have to be a single numeric value.")
 
-  # Loglikelihood of the original study ----------------------------------------
+  # Model likelihoods, priors and posteriors -----------------------------------
   loglik <- function(theta, XF, Xdf1, Xdf2, XN) {
     ifelse(theta < 0,
            log(0),
            df(XF, Xdf1, Xdf2, ncp = theta * XN, log = T))
   }
 
+  prior.orig <- function(theta) {
+    # We start out with noninformative/uniform prior - even if this is not a
+    # proper probability density
+    return(log(1))
+  }
+
+  posterior.orig <- function(theta, XF, Xdf1, Xdf2, XN) {
+    # Non-normalized posterior density by multiplying likelihood and prior
+    return(loglik(theta, XF, Xdf1, Xdf2, XN) +
+             prior.orig(theta))
+  }
+
+  posterior.rep <- function(theta, XF, Xdf1, Xdf2, XN,
+                            XForig, Xdf1orig, Xdf2orig, XNorig, XMLorig) {
+    # Non-normalized posterior density by multiplying likelihood and
+    # prior (i.e. non-normalized posterior of original study) and dividing by
+    # marginal likelihood/normalizing constant from original study
+    return(loglik(theta, XF, Xdf1, Xdf2, XN) +
+             posterior.orig(theta, XForig, Xdf1orig, Xdf2orig, XNorig) -
+             log(XMLorig))
+  }
+
+  # MCMC approximation settings ------------------------------------------------
+  proposal.vcov <- matrix(ncol = 1, nrow = 1, c(1))
+  sampling.tune <- 0.5
+  sampling.thin <- 1
+
   # MCMC approximation to the original study's posterior -----------------------
   R.utils::captureOutput({
-    posterior.sample <- MCMCpack::MCMCmetrop1R(loglik, theta.init = c(0),
-                                               logfun = T, burnin = 500, mcmc = M,
-                                               thin = 1, verbose = 0,
-                                               V = matrix(ncol = 1, nrow = 1,
-                                                          c(1)),
-                                               XF = F.orig, Xdf1 = df.orig[1],
-                                               Xdf2 = df.orig[2], XN = N.orig)
+    posterior.sample.orig <- MCMCpack::MCMCmetrop1R(posterior.orig,
+                                                    theta.init = c(0),
+                                                    logfun = T, burnin = 500,
+                                                    mcmc = M,
+                                                    thin = sampling.thin,
+                                                    tune = sampling.tune,
+                                                    V = proposal.vcov,
+                                                    verbose = 0,
+                                                    # Observed data (original)
+                                                    XF = F.orig,
+                                                    Xdf1 = df.orig[1],
+                                                    Xdf2 = df.orig[2],
+                                                    XN = N.orig)
   })
 
+  # Importance sampling estimate for marginal likelihood of original study -----
+  is.mean.est <- mean(posterior.sample.orig)
+  is.sd.est <- sd(posterior.sample.orig)
+  is.sample.orig <- rtruncnorm(M, mean = is.mean.est, sd = is.sd.est, a = 0)
+  modelevidence.orig <- mean(exp(posterior.orig(theta = is.sample.orig,
+                                                XF = F.orig, Xdf1 = df.orig[1],
+                                                Xdf2 = df.orig[2],
+                                                XN = N.orig)) /
+                               dtruncnorm(is.sample.orig,
+                                          mean = is.mean.est,
+                                          sd = is.sd.est,
+                                          a = 0))
+
+  # MCMC approximation to the replication study's posterior --------------------
+  R.utils::captureOutput({
+    posterior.sample.rep <- MCMCpack::MCMCmetrop1R(posterior.rep,
+                                                   theta.init = c(0),
+                                                   logfun = T, burnin = 500,
+                                                   mcmc = M,
+                                                   thin = sampling.thin,
+                                                   tune = sampling.tune,
+                                                   V = proposal.vcov,
+                                                   verbose = 0,
+                                                   # Observed data (original)
+                                                   XForig = F.orig,
+                                                   Xdf1orig = df.orig[1],
+                                                   Xdf2orig = df.orig[2],
+                                                   XNorig = N.orig,
+                                                   XMLorig = modelevidence.orig,
+                                                   # Observed data (replication)
+                                                   XF = F.rep,
+                                                   Xdf1 = df.rep[1],
+                                                   Xdf2 = df.rep[2],
+                                                   XN = N.rep)
+  })
+
+  # Importance sampling estimate for marginal likelihood of original study -----
+  is.mean.est <- mean(posterior.sample.rep)
+  is.sd.est <- sd(posterior.sample.rep)
+  is.sample.rep <- rtruncnorm(M, mean = is.mean.est, sd = is.sd.est, a = 0)
+  modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.rep,
+                                              XForig = F.orig,
+                                              Xdf1orig = df.orig[1],
+                                              Xdf2orig = df.orig[2],
+                                              XNorig = N.orig,
+                                              XMLorig = modelevidence.orig,
+                                              XF = F.rep, Xdf1 = df.rep[1],
+                                              Xdf2 = df.rep[2],
+                                              XN = N.rep)) /
+                               dtruncnorm(is.sample.rep,
+                                          mean = is.mean.est,
+                                          sd = is.sd.est,
+                                          a = 0))
+
   # Calculate (marginal) likelihoods -------------------------------------------
-  likelihood.h0 = df(F.rep, df.rep[1], df.rep[2])
-  likelihood.hr = mean(df(F.rep, df.rep[1], df.rep[2],
-                          ncp = posterior.sample * N.rep))
+  likelihood.h0 <- df(F.rep, df.rep[1], df.rep[2])
+  #likelihood.hr_mc <- mean(df(F.rep, df.rep[1], df.rep[2],
+  #                           ncp = posterior.sample.orig * N.rep))
+  likelihood.hr_is <- modelevidence.rep
 
-  rbf <- likelihood.hr / likelihood.h0
 
-  if (!store.samples)
-    posterior.sample = NULL
+  rbf <- likelihood.hr_is / likelihood.h0
+
+  if (!store.samples) {
+    posterior.sample.orig <- NULL
+    posterior.sample.rep <- NULL
+  }
 
   # Prepare return object ------------------------------------------------------
   ret.object <- list(
     # Numeric value of the Bayes Factor
     bayesFactor = rbf,
+    #bayesFactor_MC = likelihood.hr_mc / likelihood.h0,
 
     # Samples from the original study's posterior (empty if store.samples = F)
-    posteriorSamples = posterior.sample,
+    #posteriorSamples = posterior.sample,
 
     # String identifying the RBF test
     test = "Replication Bayes Factor for F-tests",

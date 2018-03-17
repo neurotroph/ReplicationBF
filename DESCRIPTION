@@ -15,7 +15,8 @@ Depends: R (>= 3.0.1)
 Imports:
     MCMCpack (>= 1.4.0),
     Rdpack,
-    R.utils
+    R.utils,
+    truncnorm
 Suggests:
     MBESS (>= 4.4.1),
     ggplot2 (>= 2.2.1),
