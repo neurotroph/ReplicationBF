@@ -17,7 +17,8 @@ setClass("ReplicationBF", representation(
   functionCall = "character",
   approxMethod = "character",
   bayesFactor = "numeric",
-  posteriorSamples = "numeric",
+  posteriorSamplesOriginal = "numeric",
+  posteriorSamplesReplication = "numeric",
   originalStudy = "list",
   replicationStudy = "list"
 ))
