@@ -45,6 +45,11 @@ positions:
         \eqn{\theta \approx \theta_{orig}} with \eqn{\theta_{orig}} being
         the effect size estimate from the original study.
 }
+
+In contrast to the originally proposed Replication Bayes factor, this method
+estimates the Bayes factor using importance sampling. This yields different
+results than the code provided by Verhagen and Wagenmakers (2014), but is
+more stable and less biased than the Monte Carlo estimate (see Bos, 2002).
 }
 \examples{
 # Example 1 from Verhagen & Wagenmakers (2014)

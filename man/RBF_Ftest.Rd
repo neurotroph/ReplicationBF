@@ -34,7 +34,7 @@ An \code{ReplicationBF} object containing the value of the
 }
 \description{
 \code{RBF_Ftest} calculates a Replication Bayes Factor for F-Tests from
-balanced fixed effect, between subject ANOVA designs.
+balanced fixed effect, between subject ANOVA designs (Harms, 2018).
 }
 \details{
 The Replication Bayes Factor is a marginal likelihood ratio between two

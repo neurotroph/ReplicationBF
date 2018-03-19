@@ -1,7 +1,7 @@
 #' Calculate a Replication Bayes Factor for F-Tests.
 #'
 #' \code{RBF_Ftest} calculates a Replication Bayes Factor for F-Tests from
-#' balanced fixed effect, between subject ANOVA designs.
+#' balanced fixed effect, between subject ANOVA designs (Harms, 2018).
 #'
 #' The Replication Bayes Factor is a marginal likelihood ratio between two
 #' positions (see Verhagen & Wagenmakers, 2014):

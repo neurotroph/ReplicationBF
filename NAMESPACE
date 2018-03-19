@@ -6,6 +6,6 @@ exportClasses(ReplicationBF)
 
 importFrom(Rdpack, reprompt)
 importFrom("stats", "df", "dt", "integrate", "qnorm", "rnorm", "runif",
-           "approxfun", "density", "sd")
+           "approxfun", "density", "sd", "dnorm")
 importFrom("truncnorm", "rtruncnorm", "dtruncnorm")
 importFrom("graphics", "par", "plot")

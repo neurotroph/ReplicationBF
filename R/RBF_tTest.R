@@ -16,6 +16,11 @@
 #'         the effect size estimate from the original study.
 #' }
 #'
+#' In contrast to the originally proposed Replication Bayes factor, this method
+#' estimates the Bayes factor using importance sampling. This yields different
+#' results than the code provided by Verhagen and Wagenmakers (2014), but is
+#' more stable and less biased than the Monte Carlo estimate (see Bos, 2002).
+#'
 #' @references
 #' \insertRef{Verhagen2014}{ReplicationBF}
 #'
@@ -42,7 +47,7 @@
 
 
 RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
-                      method = "NormApprox", M = 1e6, store.samples = FALSE) {
+                      method = "NormApprox", M = 1e5, store.samples = FALSE) {
   # Check arguments ------------------------------------------------------------
   if (length(n.orig) != length(n.rep))
     stop("N from original and replication study have different lengths.")
@@ -64,6 +69,40 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
     sqrt.n.rep <- sqrt(1 / (1 / n.rep[1] + 1 / n.rep[2]) )
   }
 
+  # Model functions for MCMC sampling ------------------------------------------
+  loglik <- function(theta, Xt, Xdf, XN) {
+    return(dt(Xt, Xdf, ncp = theta*XN, log = T))
+  }
+
+  prior.orig <- function(theta) {
+    # Using an improper, uniform prior - doesn't matter, because integral stays
+    # the same.
+    return(log(1))
+  }
+
+  posterior.orig <- function(theta, Xt, Xdf, XN) {
+    # Non-normalized posterior density by multiplying likelihood and prior
+    return(loglik(theta, Xt, Xdf, XN) +
+             prior.orig(theta))
+  }
+
+  posterior.rep <- function(theta, Xt, Xdf, XN,
+                            Xtorig, Xdforig, XNorig, XMLorig) {
+    # Non-normalized posterior density by multiplying likelihood and
+    # prior (i.e. non-normalized posterior of original study) and dividing by
+    # marginal likelihood/normalizing constant from original study
+    return(loglik(theta, Xt, Xdf, XN) +
+             posterior.orig(theta, Xtorig, Xdforig, XNorig) -
+             log(XMLorig))
+  }
+
+  # MCMC approximation settings ------------------------------------------------
+  proposal.vcov <- matrix(ncol = 1, nrow = 1, c(1))
+  sampling.tune <- 0.5
+  sampling.thin <- 1
+
+
+  # Sampling from original study's posterior -----------------------------------
   if (method == "NormApprox") {
     # Calculate Confidence Interval for NCP of noncentral t-Distribution -------
     if (!requireNamespace("MBESS", quietly = TRUE)) {
@@ -75,34 +114,79 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
     # Calculate paramters for approximated Normal distribution -----------------
     mu.delta <- t.orig / sqrt.n.orig
     sd.delta <- abs( ((t.orig - delta.lower) / qnorm(.025)) / sqrt.n.orig )
-    posterior.sample <- rnorm(M, mu.delta, sd.delta)
-
-    # Calculate (marginal) likelihoods -----------------------------------------
-    likelihood.h0 <- dt(t.rep, df.rep)
-    likelihood.hr <- mean(dt(t.rep, df.rep,
-                             ncp = posterior.sample * sqrt.n.rep))
+    posterior.sample.orig <- rnorm(M, mu.delta, sd.delta)
   } else if (method == "MCMC") {
     # Approximate posterior of original study using MCMC -----------------------
-    loglik <- function(theta, Xt, Xdf, XN) dt(Xt, Xdf, ncp = theta*XN, log = T)
     R.utils::captureOutput({
-      posterior.sample <- MCMCpack::MCMCmetrop1R(loglik, theta.init = runif(1),
-                                                 logfun = TRUE, mcmc = M,
-                                                 burnin = 500, verbose = 0,
-                                                 Xt = t.orig, Xdf = df.orig,
-                                                 XN = sqrt.n.orig)
+      posterior.sample.orig <- MCMCpack::MCMCmetrop1R(posterior.orig,
+                                                      theta.init = runif(1),
+                                                      logfun = TRUE, mcmc = M,
+                                                      burnin = 500, verbose = 0,
+                                                      thin = sampling.thin,
+                                                      tune = sampling.tune,
+                                                      V = proposal.vcov,
+                                                      Xt = t.orig,
+                                                      Xdf = df.orig,
+                                                      XN = sqrt.n.orig)
     })
 
-    # Calculate (marginal) likelihoods -----------------------------------------
-    likelihood.h0 <- dt(t.rep, df.rep)
-    likelihood.hr <- mean(dt(t.rep, df.rep,
-                             ncp = posterior.sample * sqrt.n.rep))
   } else {
     stop("Approximation method not supported.")
   }
 
-  rbf <- likelihood.hr / likelihood.h0
-  if (!store.samples)
-    posterior.sample = NULL
+  # Importance sampling estimate for marginal likelihood of original study -----
+  is.mean.est <- mean(posterior.sample.orig)
+  is.sd.est <- sd(posterior.sample.orig)
+  is.sample.orig <- rnorm(M, mean = is.mean.est, sd = is.sd.est)
+  modelevidence.orig <- mean(exp(posterior.orig(theta = is.sample.orig,
+                                                Xt = t.orig, Xdf = df.orig,
+                                                XN = sqrt.n.orig)) /
+                               dnorm(is.sample.orig, mean = is.mean.est,
+                                     sd = is.sd.est))
+
+  # Sample posterior of replication study --------------------------------------
+  R.utils::captureOutput({
+    posterior.sample.rep <- MCMCpack::MCMCmetrop1R(posterior.rep,
+                                                   theta.init = runif(1),
+                                                   logfun = TRUE, mcmc = M,
+                                                   burnin = 500, verbose = 0,
+                                                   thin = sampling.thin,
+                                                   tune = sampling.tune,
+                                                   V = proposal.vcov,
+                                                   # Original data
+                                                   Xtorig = t.orig,
+                                                   Xdforig = df.orig,
+                                                   XNorig = sqrt.n.orig,
+                                                   XMLorig = modelevidence.orig,
+                                                   # Replication data
+                                                   Xt = t.rep,
+                                                   Xdf = df.rep,
+                                                   XN = sqrt.n.rep)
+  })
+
+  # Importance sampling estimate for marginal likelihood of replication --------
+  is.mean.est <- mean(posterior.sample.rep)
+  is.sd.est <- sd(posterior.sample.rep)
+  is.sample.rep <- rnorm(M, mean = is.mean.est, sd = is.sd.est)
+  modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.orig,
+                                              # Replication study data
+                                              Xt = t.rep, Xdf = df.rep,
+                                              XN = sqrt.n.rep,
+                                              # Original study data
+                                              Xtorig = t.orig, Xdforig = df.orig,
+                                              XNorig = sqrt.n.orig,
+                                              XMLorig = modelevidence.orig)) /
+                               dnorm(is.sample.orig, mean = is.mean.est,
+                                     sd = is.sd.est))
+
+  likelihood.h0 <- dt(t.rep, df.rep)
+  likelihood.hr_is <- modelevidence.rep
+
+  rbf <- likelihood.hr_is / likelihood.h0
+  if (!store.samples) {
+    posterior.sample.orig = NULL
+    posterior.sample.rep = NULL
+  }
 
   # Prepare return object ------------------------------------------------------
   ret.object <- list(
@@ -110,7 +194,8 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
     bayesFactor = rbf,
 
     # Samples from the original study's posterior (empty if store.samples = F)
-    posteriorSamples = posterior.sample,
+    posteriorSamplesOriginal = posterior.sample.orig,
+    posteriorSamplesReplication = posterior.sample.rep,
 
     # String identifying the RBF test
     test = "Replication Bayes Factor for t-tests",
