@@ -33,7 +33,7 @@ An \code{ReplicationBF} object containing the value of the
     Replication Bayes Factor in \code{bayesFactor}.
 }
 \description{
-\code{RBF_ttest} calculates a Replication Bayes Factor for F-Tests from
+\code{RBF_Ftest} calculates a Replication Bayes Factor for F-Tests from
 balanced fixed effect, between subject ANOVA designs.
 }
 \details{
@@ -49,6 +49,11 @@ positions (see Verhagen & Wagenmakers, 2014):
         \eqn{\theta \approx \theta_{orig}} with \eqn{\theta_{orig}} being
         the effect size estimate from the original study.
 }
+
+The Bayes factor is estimated through Importance Sampling (Gamerman & Lopes,
+2006). The importance density is half-normal with parameters estimated from
+the posterior distribution. Posterior distribution is sampled using
+Metropolis-Hastings from \code{MCMCpack::MCMCmetrop1R}.
 }
 \examples{
 RBF_Ftest(27.0, c(3, 48), 52, 3.2, c(3, 33), 37)

@@ -1,6 +1,6 @@
 #' Calculate a Replication Bayes Factor for F-Tests.
 #'
-#' \code{RBF_ttest} calculates a Replication Bayes Factor for F-Tests from
+#' \code{RBF_Ftest} calculates a Replication Bayes Factor for F-Tests from
 #' balanced fixed effect, between subject ANOVA designs.
 #'
 #' The Replication Bayes Factor is a marginal likelihood ratio between two
@@ -15,6 +15,11 @@
 #'         \eqn{\theta \approx \theta_{orig}} with \eqn{\theta_{orig}} being
 #'         the effect size estimate from the original study.
 #' }
+#'
+#' The Bayes factor is estimated through Importance Sampling (Gamerman & Lopes,
+#' 2006). The importance density is half-normal with parameters estimated from
+#' the posterior distribution. Posterior distribution is sampled using
+#' Metropolis-Hastings from \code{MCMCpack::MCMCmetrop1R}.
 #'
 #' @references
 #' \itemize{
@@ -177,10 +182,10 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
   ret.object <- list(
     # Numeric value of the Bayes Factor
     bayesFactor = rbf,
-    #bayesFactor_MC = likelihood.hr_mc / likelihood.h0,
 
     # Samples from the original study's posterior (empty if store.samples = F)
-    #posteriorSamples = posterior.sample,
+    posteriorSamplesOriginal = posterior.sample.orig,
+    posteriorSamplesReplication = posterior.sample.rep,
 
     # String identifying the RBF test
     test = "Replication Bayes Factor for F-tests",
