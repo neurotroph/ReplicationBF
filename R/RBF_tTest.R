@@ -168,7 +168,7 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
   is.mean.est <- mean(posterior.sample.rep)
   is.sd.est <- sd(posterior.sample.rep)
   is.sample.rep <- rnorm(M, mean = is.mean.est, sd = is.sd.est)
-  modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.orig,
+  modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.rep,
                                               # Replication study data
                                               Xt = t.rep, Xdf = df.rep,
                                               XN = sqrt.n.rep,
@@ -176,7 +176,7 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
                                               Xtorig = t.orig, Xdforig = df.orig,
                                               XNorig = sqrt.n.orig,
                                               XMLorig = modelevidence.orig)) /
-                               dnorm(is.sample.orig, mean = is.mean.est,
+                               dnorm(is.sample.rep, mean = is.mean.est,
                                      sd = is.sd.est))
 
   likelihood.h0 <- dt(t.rep, df.rep)
