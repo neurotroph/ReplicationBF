@@ -5,4 +5,5 @@
 #'
 #' @docType package
 #' @name ReplicationBF
+#' @importFrom Rdpack reprompt
 NULL

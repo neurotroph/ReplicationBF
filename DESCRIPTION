@@ -1,7 +1,7 @@
 Package: ReplicationBF
 Type: Package
 Title: Calculating Replication Bayes Factors for Different Scenarios
-Version: 0.0.2.9000
+Version: 0.0.3.9000
 Date: 2017-11-19
 Authors@R: person("Christopher", "Harms",
     email = "christopher.harms@uni-bonn.de", role = c("aut", "cre"))
@@ -17,10 +17,9 @@ Imports:
     Rdpack,
     R.utils,
     truncnorm,
-    ggplot2
+    ggplot2 (>= 2.2.1)
 Suggests:
     MBESS (>= 4.4.1),
-    ggplot2 (>= 2.2.1),
     knitr,
     rmarkdown,
     methods

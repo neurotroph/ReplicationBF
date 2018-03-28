@@ -2,17 +2,30 @@
 % Please edit documentation in R/plot_RBF.R
 \name{plot_RBF}
 \alias{plot_RBF}
-\title{Plot the results of a Replication Bayes Factor.}
+\title{Plot \code{ReplicationBF} object}
 \usage{
-plot_RBF(rbf.object)
+plot_RBF(rbf.object, use.ggplot = TRUE)
 }
 \arguments{
-\item{rbf.object}{Result from \code{\link{RBF_ttest}} or
-\code{\link{RBF_Ftest}}.}
+\item{rbf.object}{Object from an \code{RBF_*} call. Has to include Posterior
+samples (\code{store.samples = TRUE}).}
+
+\item{use.ggplot}{If \code{TRUE} uses \code{ggplot2}. \code{FALSE} not yet
+supported.}
 }
 \value{
-None.
+A \code{ggplot} object containing the plot.
 }
 \description{
-Plot the results of a Replication Bayes Factor.
+This method can be used to visually represent a Replication Bayes Factor.
+}
+\details{
+\code{plot_RBF} generally is a Savage-Dickey ratio representation:
+Prior and Posterior distributions are plotted and the ratio of the
+distributions at \eqn{\delta = 0} is calculated (see Wagenmakers et al., 2010).
+}
+\references{
+\itemize{
+    \item \insertRef{Wagenmakers2010}{ReplicationBF}
+}
 }

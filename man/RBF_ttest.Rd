@@ -23,10 +23,11 @@ approximation through the Metropolis algorithm.}
 \item{M}{Number of posterior samples (either MCMC or Normal distribution).}
 
 \item{store.samples}{If \code{TRUE}, the returned object contains \code{M}
-samples from the original study's posterior distribution.}
+samples from the original study's posterior distribution (required for
+\code{plot_RBF}).}
 }
 \value{
-Replication Bayes Factor as numeric value.
+An object of \code{ReplicationBF} class.
 }
 \description{
 \code{RBF_ttest} calculates a Replication Bayes Factor (Verhagen &
@@ -34,7 +35,7 @@ Wagenmakers, 2014) for t-Tests.
 }
 \details{
 The Replication Bayes Factor is a marginal likelihood ratio between two
-positions:
+models, characterized by the following positions:
 \itemize{
     \item \strong{H0}: The position of a skeptic, who does not place
         confidence in the findings of the original study and assumes
@@ -49,7 +50,9 @@ positions:
 In contrast to the originally proposed Replication Bayes factor, this method
 estimates the Bayes factor using importance sampling. This yields different
 results than the code provided by Verhagen and Wagenmakers (2014), but is
-more stable and less biased than the Monte Carlo estimate (see Bos, 2002).
+more stable and less biased than the Monte Carlo estimate (see Bos, 2002) in
+cases where original and replication study yield different effect size
+estimates.
 }
 \examples{
 # Example 1 from Verhagen & Wagenmakers (2014)
@@ -60,5 +63,8 @@ RBF_ttest(2.10, c(11, 11), 3.06, c(27, 28), method = "NormApprox")
 RBF_ttest(2.10, c(11, 11), 3.06, c(27, 28), method = "MCMC")
 }
 \references{
-\insertRef{Verhagen2014}{ReplicationBF}
+\itemize{
+    \item \insertRef{Verhagen2014}{ReplicationBF}
+    \item \insertRef{Bos2002}{ReplicationBF}
+}
 }

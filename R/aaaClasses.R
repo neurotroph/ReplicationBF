@@ -2,8 +2,10 @@
 #'
 #' @slot bayesFactor The numerical value of the Replication Bayes Factor.
 #' @slot approxMethod Method used to approximate the marginal likelihoods.
-#' @slot posteriorSamples A \code{data.frame} containing the samples from the
-#'     original study's posterior distribution.
+#' @slot posteriorSamplesOriginal A \code{data.frame} containing the samples
+#'     from the original study's posterior distribution.
+#' @slot posteriorSamplesReplication A \code{data.frame} containing samples
+#'     from the replication study's posterior distribution.
 #' @slot test A string that contains which test was used.
 #' @slot functionCall String containing the function call.
 #' @slot originalStudy Data from the original study that went into the analysis.

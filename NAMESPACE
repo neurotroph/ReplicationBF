@@ -9,3 +9,6 @@ importFrom("stats", "df", "dt", "integrate", "qnorm", "rnorm", "runif",
            "approxfun", "density", "sd", "dnorm")
 importFrom("truncnorm", "rtruncnorm", "dtruncnorm")
 importFrom("graphics", "par", "plot")
+importFrom("ggplot2", "ggplot", "stat_density", "aes", "geom_point",
+           "scale_x_continuous", "scale_y_continuous", "scale_linetype_manual",
+           "annotate")

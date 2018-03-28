@@ -32,4 +32,4 @@ RBF_Ftest(27.0, c(3, 48), 52, 3.2, c(3, 33), 37)
 
 ## References
 * Verhagen, J., & Wagenmakers, E.-J. (2014). Bayesian tests to quantify the result of a replication attempt. Journal of Experimental Psychology: General, 143(4), 1457–1475. http://doi.org/10.1037/a0036731
-* Harms, C. (2016). A Bayes Factor for Replications of ANOVA Results. *arXiv pre-print*. Retrieved from http://arxiv.org/abs/1611.09341
+* Harms, C. (2018). A Bayes Factor for Replications of ANOVA Results. *arXiv pre-print*. Retrieved from http://arxiv.org/abs/1611.09341

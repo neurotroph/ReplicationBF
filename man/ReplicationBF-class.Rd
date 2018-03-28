@@ -14,8 +14,11 @@ General S4 class for a single Replication Bayes Factor
 
 \item{\code{approxMethod}}{Method used to approximate the marginal likelihoods.}
 
-\item{\code{posteriorSamples}}{A \code{data.frame} containing the samples from the
-original study's posterior distribution.}
+\item{\code{posteriorSamplesOriginal}}{A \code{data.frame} containing the samples
+from the original study's posterior distribution.}
+
+\item{\code{posteriorSamplesReplication}}{A \code{data.frame} containing samples
+from the replication study's posterior distribution.}
 
 \item{\code{test}}{A string that contains which test was used.}
 
