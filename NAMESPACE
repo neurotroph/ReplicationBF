@@ -2,5 +2,5 @@
 
 export(RBF_Ftest)
 export(RBF_ttest)
-export(plot_RBF)
+export(plot.ReplicationBF)
 exportClasses(ReplicationBF)

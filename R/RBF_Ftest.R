@@ -45,7 +45,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' RBF_Ftest(27.0, c(3, 48), 52, 3.2, c(3, 33), 37)
+#' }
 
 RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
                       M = 1e5, store.samples = FALSE)

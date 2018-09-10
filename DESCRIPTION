@@ -1,8 +1,8 @@
 Package: ReplicationBF
 Type: Package
 Title: Calculating Replication Bayes Factors for Different Scenarios
-Version: 0.0.3.9000
-Date: 2017-11-19
+Version: 0.0.4.9000
+Date: 2018-08-10
 Authors@R: person("Christopher", "Harms",
     email = "christopher.harms@uni-bonn.de", role = c("aut", "cre"))
 Description: This package allows to easily calculate Replication Bayes Factors

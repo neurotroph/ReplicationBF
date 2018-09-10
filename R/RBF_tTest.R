@@ -44,6 +44,7 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' # Example 1 from Verhagen & Wagenmakers (2014)
 #' # Using a Normal approximation to the original's posterior distribution
 #' RBF_ttest(2.18, c(10, 11), 3.06, c(27, 27), method = "NormApprox")
@@ -54,6 +55,7 @@
 #' RBF_ttest(2.10, c(11, 11), 3.06, c(27, 28), method = "MCMC")
 #' RBF_ttest(2.18, c(10, 11), 0.25, c(27, 27), method = "MCMC")
 #' RBF_ttest(2.18, c(10, 11), 2.44, c(16, 17), method = "MCMC")
+#' }
 
 
 RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,

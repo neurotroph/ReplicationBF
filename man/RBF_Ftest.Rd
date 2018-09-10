@@ -56,7 +56,9 @@ the posterior distribution. Posterior distribution is sampled using
 Metropolis-Hastings from \code{MCMCpack::MCMCmetrop1R}.
 }
 \examples{
+\dontrun{
 RBF_Ftest(27.0, c(3, 48), 52, 3.2, c(3, 33), 37)
+}
 }
 \references{
 \itemize{

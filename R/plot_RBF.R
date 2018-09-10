@@ -1,4 +1,4 @@
-#' Plot \code{ReplicationBF} object
+#' Plotting \code{ReplicationBF} objects
 #'
 #' This method can be used to visually represent a Replication Bayes Factor.
 #'
@@ -18,9 +18,23 @@
 #' }
 #'
 #' @return A \code{ggplot2} object containing the plot.
+#' @examples
+#' \dontrun{
+#' # Run RBF function with store.samples = T to save posterior samples used
+#' # for plotting
+#' rbf <- RBF_ttest(2.18, c(10, 11), 3.06, c(27, 27), method = "NormApprox",
+#'   store.samples = T)
+#' plot(rbf)
+#'
+#' # If samples are missing, plot() will throw an error:
+#' rbf <- RBF_ttest(2.18, c(10, 11), 3.06, c(27, 27), method = "NormApprox")
+#' plot(rbf)
+#' }
+#'
+#' @rdname plot
 #' @export
-
-plot.ReplicationBF <- function(rbf.object, use.ggplot = TRUE) {
+plot.ReplicationBF <- function(x, ..., use.ggplot = TRUE) {
+  rbf.object <- x
 
   # Check arguments ------------------------------------------------------------
   if (class(rbf.object) != "ReplicationBF")
