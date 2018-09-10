@@ -63,7 +63,7 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
   loglik <- function(theta, XF, Xdf1, Xdf2, XN) {
     ifelse(theta < 0,
            log(0),
-           df(XF, Xdf1, Xdf2, ncp = theta * XN, log = T))
+           stats::df(XF, Xdf1, Xdf2, ncp = theta * XN, log = T))
   }
 
   prior.orig <- function(theta) {
@@ -112,16 +112,17 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
 
   # Importance sampling estimate for marginal likelihood of original study -----
   is.mean.est <- mean(posterior.sample.orig)
-  is.sd.est <- sd(posterior.sample.orig)
-  is.sample.orig <- rtruncnorm(M, mean = is.mean.est, sd = is.sd.est, a = 0)
+  is.sd.est <- stats::sd(posterior.sample.orig)
+  is.sample.orig <- truncnorm::rtruncnorm(M, mean = is.mean.est, sd = is.sd.est,
+                                          a = 0)
   modelevidence.orig <- mean(exp(posterior.orig(theta = is.sample.orig,
                                                 XF = F.orig, Xdf1 = df.orig[1],
                                                 Xdf2 = df.orig[2],
                                                 XN = N.orig)) /
-                               dtruncnorm(is.sample.orig,
-                                          mean = is.mean.est,
-                                          sd = is.sd.est,
-                                          a = 0))
+                               truncnorm::dtruncnorm(is.sample.orig,
+                                                     mean = is.mean.est,
+                                                     sd = is.sd.est,
+                                                     a = 0))
 
   # MCMC approximation to the replication study's posterior --------------------
   R.utils::captureOutput({
@@ -148,8 +149,9 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
 
   # Importance sampling estimate for marginal likelihood of original study -----
   is.mean.est <- mean(posterior.sample.rep)
-  is.sd.est <- sd(posterior.sample.rep)
-  is.sample.rep <- rtruncnorm(M, mean = is.mean.est, sd = is.sd.est, a = 0)
+  is.sd.est <- stats::sd(posterior.sample.rep)
+  is.sample.rep <- truncnorm::rtruncnorm(M, mean = is.mean.est, sd = is.sd.est,
+                                         a = 0)
   modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.rep,
                                               XForig = F.orig,
                                               Xdf1orig = df.orig[1],
@@ -159,13 +161,13 @@ RBF_Ftest <- function(F.orig, df.orig, N.orig, F.rep, df.rep, N.rep,
                                               XF = F.rep, Xdf1 = df.rep[1],
                                               Xdf2 = df.rep[2],
                                               XN = N.rep)) /
-                               dtruncnorm(is.sample.rep,
-                                          mean = is.mean.est,
-                                          sd = is.sd.est,
-                                          a = 0))
+                              truncnorm::dtruncnorm(is.sample.rep,
+                                                    mean = is.mean.est,
+                                                    sd = is.sd.est,
+                                                    a = 0))
 
   # Calculate (marginal) likelihoods -------------------------------------------
-  likelihood.h0 <- df(F.rep, df.rep[1], df.rep[2])
+  likelihood.h0 <- stats::df(F.rep, df.rep[1], df.rep[2])
   #likelihood.hr_mc <- mean(df(F.rep, df.rep[1], df.rep[2],
   #                           ncp = posterior.sample.orig * N.rep))
   likelihood.hr_is <- modelevidence.rep

@@ -4,8 +4,8 @@
 \alias{RBF_ttest}
 \title{Calculate a Replication Bayes Factor for a two-sample t-Test.}
 \usage{
-RBF_ttest(t.orig, n.orig, t.rep, n.rep, method = "NormApprox", M = 1e+05,
-  store.samples = FALSE)
+RBF_ttest(t.orig, n.orig, t.rep, n.rep, method = "NormApprox",
+  M = 1e+05, store.samples = FALSE)
 }
 \arguments{
 \item{t.orig}{t-statistic of the original study.}

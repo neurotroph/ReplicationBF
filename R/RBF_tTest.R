@@ -46,10 +46,14 @@
 #' @examples
 #' # Example 1 from Verhagen & Wagenmakers (2014)
 #' # Using a Normal approximation to the original's posterior distribution
-#' RBF_ttest(2.10, c(11, 11), 3.06, c(27, 28), method = "NormApprox")
+#' RBF_ttest(2.18, c(10, 11), 3.06, c(27, 27), method = "NormApprox")
+#' RBF_ttest(2.18, c(10, 11), 0.25, c(27, 27), method = "NormApprox")
+#' RBF_ttest(2.18, c(10, 11), 2.44, c(16, 17), method = "NormApprox")
 #'
 #' # Using MCMC to draw samples from the original's posterior distribution
 #' RBF_ttest(2.10, c(11, 11), 3.06, c(27, 28), method = "MCMC")
+#' RBF_ttest(2.18, c(10, 11), 0.25, c(27, 27), method = "MCMC")
+#' RBF_ttest(2.18, c(10, 11), 2.44, c(16, 17), method = "MCMC")
 
 
 RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
@@ -77,7 +81,7 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
 
   # Model functions for MCMC sampling ------------------------------------------
   loglik <- function(theta, Xt, Xdf, XN) {
-    return(dt(Xt, Xdf, ncp = theta*XN, log = T))
+    return(stats::dt(Xt, Xdf, ncp = theta*XN, log = T))
   }
 
   prior.orig <- function(theta) {
@@ -119,13 +123,13 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
 
     # Calculate paramters for approximated Normal distribution -----------------
     mu.delta <- t.orig / sqrt.n.orig
-    sd.delta <- abs( ((t.orig - delta.lower) / qnorm(.025)) / sqrt.n.orig )
-    posterior.sample.orig <- rnorm(M, mu.delta, sd.delta)
+    sd.delta <- abs( ((t.orig - delta.lower) / stats::qnorm(.025)) / sqrt.n.orig )
+    posterior.sample.orig <- stats::rnorm(M, mu.delta, sd.delta)
   } else if (method == "MCMC") {
     # Approximate posterior of original study using MCMC -----------------------
     R.utils::captureOutput({
       posterior.sample.orig <- MCMCpack::MCMCmetrop1R(posterior.orig,
-                                                      theta.init = runif(1),
+                                                      theta.init = stats::runif(1),
                                                       logfun = TRUE, mcmc = M,
                                                       burnin = 500, verbose = 0,
                                                       thin = sampling.thin,
@@ -142,18 +146,18 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
 
   # Importance sampling estimate for marginal likelihood of original study -----
   is.mean.est <- mean(posterior.sample.orig)
-  is.sd.est <- sd(posterior.sample.orig)
-  is.sample.orig <- rnorm(M, mean = is.mean.est, sd = is.sd.est)
+  is.sd.est <- stats::sd(posterior.sample.orig)
+  is.sample.orig <- stats::rnorm(M, mean = is.mean.est, sd = is.sd.est)
   modelevidence.orig <- mean(exp(posterior.orig(theta = is.sample.orig,
                                                 Xt = t.orig, Xdf = df.orig,
                                                 XN = sqrt.n.orig)) /
-                               dnorm(is.sample.orig, mean = is.mean.est,
+                               stats::dnorm(is.sample.orig, mean = is.mean.est,
                                      sd = is.sd.est))
 
   # Sample posterior of replication study --------------------------------------
   R.utils::captureOutput({
     posterior.sample.rep <- MCMCpack::MCMCmetrop1R(posterior.rep,
-                                                   theta.init = runif(1),
+                                                   theta.init = stats::runif(1),
                                                    logfun = TRUE, mcmc = M,
                                                    burnin = 500, verbose = 0,
                                                    thin = sampling.thin,
@@ -172,8 +176,8 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
 
   # Importance sampling estimate for marginal likelihood of replication --------
   is.mean.est <- mean(posterior.sample.rep)
-  is.sd.est <- sd(posterior.sample.rep)
-  is.sample.rep <- rnorm(M, mean = is.mean.est, sd = is.sd.est)
+  is.sd.est <- stats::sd(posterior.sample.rep)
+  is.sample.rep <- stats::rnorm(M, mean = is.mean.est, sd = is.sd.est)
   modelevidence.rep <- mean(exp(posterior.rep(theta = is.sample.rep,
                                               # Replication study data
                                               Xt = t.rep, Xdf = df.rep,
@@ -182,10 +186,10 @@ RBF_ttest <- function(t.orig, n.orig, t.rep, n.rep,
                                               Xtorig = t.orig, Xdforig = df.orig,
                                               XNorig = sqrt.n.orig,
                                               XMLorig = modelevidence.orig)) /
-                               dnorm(is.sample.rep, mean = is.mean.est,
+                              stats::dnorm(is.sample.rep, mean = is.mean.est,
                                      sd = is.sd.est))
 
-  likelihood.h0 <- dt(t.rep, df.rep)
+  likelihood.h0 <- stats::dt(t.rep, df.rep)
   likelihood.hr_is <- modelevidence.rep
 
   rbf <- likelihood.hr_is / likelihood.h0

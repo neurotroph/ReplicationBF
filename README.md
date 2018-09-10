@@ -1,7 +1,7 @@
 # `ReplicationBF` -- R package to calculate Replication Bayes Factors
 
 This package allows users to calculate Replication Bayes Factors for different
-scenarios. See Verhagen & Wagenmakers (2014) and Harms (2016) for reference.
+scenarios. See Verhagen & Wagenmakers (2014) and Harms (2018) for reference.
 
 ## Installation
 The package is currently only available through this GitHub repository, so you
@@ -31,5 +31,5 @@ RBF_Ftest(27.0, c(3, 48), 52, 3.2, c(3, 33), 37)
 ```
 
 ## References
+* Harms, C. (in press). A Bayes Factor for Replications of ANOVA Results. *The American Statistician*. Retrieved from http://arxiv.org/abs/1611.09341
 * Verhagen, J., & Wagenmakers, E.-J. (2014). Bayesian tests to quantify the result of a replication attempt. Journal of Experimental Psychology: General, 143(4), 1457–1475. http://doi.org/10.1037/a0036731
-* Harms, C. (2018). A Bayes Factor for Replications of ANOVA Results. *arXiv pre-print*. Retrieved from http://arxiv.org/abs/1611.09341
